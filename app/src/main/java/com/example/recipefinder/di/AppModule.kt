@@ -1,5 +1,6 @@
 package com.example.recipefinder.di
 
+import com.example.recipefinder.data.remote.Spoonacular
 import com.example.recipefinder.util.Constants.API_KEY
 import com.example.recipefinder.util.Constants.BASE_URL
 import dagger.Module
@@ -8,6 +9,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 @Module
@@ -35,6 +38,19 @@ class AppModule {
             }.build()
     }
 
+    @Provides
+    @Singleton
+    fun provideRetrofit(BASE_UR: String,okHttpClient: OkHttpClient) : Retrofit =
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
+            .build()
 
+    @Provides
+    @Singleton
+    fun provideSpoonacular(retrofit: Retrofit) : Spoonacular {
+        return retrofit.create(Spoonacular::class.java)
+    }
 
 }
