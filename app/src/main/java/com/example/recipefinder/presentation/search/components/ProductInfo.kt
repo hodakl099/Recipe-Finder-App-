@@ -8,14 +8,19 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.recipefinder.R
+import com.example.recipefinder.data.remote.model.Product
 
 @Composable
 fun ProductInfoItem(
     modifier: Modifier = Modifier,
+    product: Product
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -29,23 +34,21 @@ fun ProductInfoItem(
         ) {
             Image(
                 contentDescription = "Image from api",
-                painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                painter =rememberAsyncImagePainter(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(product.image)
+                        .crossfade(true)
+                        .build(),
+                ),
             )
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
-                    text = "Lemon 1 lb Bulk Bag, Handcrafted w/ ONLY 2 Ingredients"
+                    text = product.title
                 )
             }
         }
     }
 }
-
-//val imagePainter = rememberAsyncImagePainter(
-//    model = ImageRequest.Builder(LocalContext.current)
-//        .data(url)
-//        .crossfade(true)
-//        .build(),
-//)

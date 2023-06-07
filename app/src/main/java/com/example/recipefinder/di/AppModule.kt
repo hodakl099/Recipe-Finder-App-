@@ -1,6 +1,10 @@
 package com.example.recipefinder.di
 
-import com.example.recipefinder.data.remote.Spoonacular
+import com.example.recipefinder.data.remote.SpoonacularApi
+import com.example.recipefinder.data.repository.SpoonacularRepoImpl
+import com.example.recipefinder.domain.repository.SpoonacularRepo
+import com.example.recipefinder.domain.use_case.SearchUseCase
+import com.example.recipefinder.domain.use_case.UseCases
 import com.example.recipefinder.util.Constants.API_KEY
 import com.example.recipefinder.util.Constants.BASE_URL
 import dagger.Module
@@ -49,8 +53,23 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideSpoonacular(retrofit: Retrofit) : Spoonacular {
-        return retrofit.create(Spoonacular::class.java)
+    fun provideSpoonacular(retrofit: Retrofit) : SpoonacularApi {
+        return retrofit.create(SpoonacularApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providesSpoonacularRepository(api : SpoonacularApi) : SpoonacularRepo {
+        return SpoonacularRepoImpl(api)
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideUseCases(repo : SpoonacularRepo) : UseCases {
+        return UseCases(
+            SearchUseCase(repo)
+        )
     }
 
 }
