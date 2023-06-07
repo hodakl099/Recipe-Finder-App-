@@ -42,3 +42,10 @@ fun ProductInfoItem(
         }
     }
 }
+
+//val imagePainter = rememberAsyncImagePainter(
+//    model = ImageRequest.Builder(LocalContext.current)
+//        .data(url)
+//        .crossfade(true)
+//        .build(),
+//)
