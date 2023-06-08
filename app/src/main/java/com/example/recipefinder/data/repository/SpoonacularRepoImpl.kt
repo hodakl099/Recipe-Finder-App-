@@ -10,7 +10,7 @@ class SpoonacularRepoImpl @Inject constructor(
 ) : SpoonacularRepo {
     override suspend fun getProductsQuery(searchQuery: String): Result<List<Product>> {
         return try {
-            val api = api.searchProductQuery(query = searchQuery)
+            val api = api.searchProductQuery(searchQuery)
             Result.success(api.results)
         } catch (e : Exception) {
             Result.failure(e)

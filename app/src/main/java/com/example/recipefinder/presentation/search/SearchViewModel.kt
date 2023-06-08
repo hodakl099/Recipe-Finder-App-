@@ -27,6 +27,8 @@ class SearchViewModel @Inject constructor(
 
     private var  searchJob : Job? = null
 
+
+
     sealed class SearchEvents {
         data class OnSearchEnter(val searchQuery : String) : SearchEvents()
         object OnSearchClick : SearchEvents()
@@ -47,6 +49,7 @@ class SearchViewModel @Inject constructor(
         when(event) {
             is SearchEvents.OnSearchEnter -> {
                 searchValue = event.searchQuery
+//                searchQuery()
             }
             is SearchEvents.OnSearchClick -> {
                 state.value = state.value.copy(products = emptyList(), loading = true)
@@ -60,7 +63,6 @@ class SearchViewModel @Inject constructor(
         searchJob?.cancel()
         searchJob =  viewModelScope.launch {
             useCases.searchUseCase.invoke(searchValue).onSuccess { products ->
-                Log.i("checking", products.size.toString())
                state.value = state.value.copy(products = products, loading = false)
            }
                 .onFailure {
