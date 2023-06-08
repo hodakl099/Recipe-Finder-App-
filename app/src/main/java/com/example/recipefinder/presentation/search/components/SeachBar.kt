@@ -17,6 +17,7 @@ fun SearchBar(
     modifier: Modifier = Modifier,
     searchQuery : String,
     onSearchQueryChange : (String) -> Unit,
+    onCLick : () -> Unit
 ) {
     Box(
         modifier = modifier
@@ -44,8 +45,10 @@ fun SearchBar(
                         unfocusedBorderColor = Color.Transparent
                     )
                 )
-            Icon(imageVector = Icons.Default.Search,
-                contentDescription = "Search Icon")
+            IconButton(onClick = onCLick) {
+                Icon(imageVector = Icons.Default.Search,
+                    contentDescription = "Search Icon")
+            }
         }
     }
 

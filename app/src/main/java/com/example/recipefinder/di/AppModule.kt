@@ -1,5 +1,6 @@
 package com.example.recipefinder.di
 
+import android.util.Log
 import com.example.recipefinder.data.remote.SpoonacularApi
 import com.example.recipefinder.data.repository.SpoonacularRepoImpl
 import com.example.recipefinder.domain.repository.SpoonacularRepo
@@ -15,6 +16,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
 import javax.inject.Singleton
 
 @Module
@@ -29,32 +31,29 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideOkhttpClient() : OkHttpClient {
+    fun provideOkhttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor(HttpLoggingInterceptor().apply {
-               level = HttpLoggingInterceptor.Level.BODY
+            .addInterceptor { chain ->
+                val request = chain.request()
+                val url = request.url.newBuilder().addQueryParameter("apiKey", API_KEY).build()
+                Log.d("OkHttp", "New URL: $url")  // Add this line to debug the URL
+                chain.proceed(request.newBuilder().url(url).build())
             }
-            )
-            .addInterceptor{ chains->
-                val request = chains.request()
-                val url = request.url.newBuilder().addQueryParameter("apikey",API_KEY).build()
-                chains.proceed(request.newBuilder().url(url).build())
-            }.build()
+            .addInterceptor(HttpLoggingInterceptor().apply {
+                level = HttpLoggingInterceptor.Level.BODY
+            })
+            .build()
     }
 
     @Provides
     @Singleton
-    fun provideRetrofit(BASE_UR: String,okHttpClient: OkHttpClient) : Retrofit =
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
+    fun provideRetrofit(BASE_UR: String,okHttpClient: OkHttpClient) : SpoonacularApi {
+        return  Retrofit.Builder()
+            .baseUrl(BASE_UR)
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
             .build()
-
-    @Provides
-    @Singleton
-    fun provideSpoonacular(retrofit: Retrofit) : SpoonacularApi {
-        return retrofit.create(SpoonacularApi::class.java)
+            .create()
     }
 
     @Provides

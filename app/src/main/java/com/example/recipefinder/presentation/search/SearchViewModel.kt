@@ -1,14 +1,21 @@
 package com.example.recipefinder.presentation.search
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.recipefinder.R
 import com.example.recipefinder.domain.use_case.UseCases
 import com.example.recipefinder.presentation.search.components.SearchState
+import com.example.recipefinder.presentation.search.util.UiEvent
+import com.example.recipefinder.util.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,13 +25,10 @@ class SearchViewModel @Inject constructor(
     private val useCases: UseCases
 ) : ViewModel() {
 
+    private var  searchJob : Job? = null
 
-    init {
-        searchQuery()
-    }
 
     sealed class SearchEvents {
-
         data class OnSearchEnter(val searchQuery : String) : SearchEvents()
         object OnSearchClick : SearchEvents()
 
@@ -35,6 +39,9 @@ class SearchViewModel @Inject constructor(
 
     var searchValue by mutableStateOf("")
     private set
+
+    private val _uiEvent = Channel<UiEvent>()
+    val uiEvent = _uiEvent.receiveAsFlow()
 
 
     fun onEvent(event: SearchEvents) {
@@ -51,14 +58,21 @@ class SearchViewModel @Inject constructor(
 
 
     private fun searchQuery() {
-        viewModelScope.launch {
+
+       viewModelScope.launch {
             useCases.searchUseCase.invoke(searchValue).onSuccess { products ->
+                Log.i("checking", products.size.toString())
                state.value = state.value.copy(products = products)
+
            }
-                .onFailure { exception->
-                    exception.printStackTrace()
+                .onFailure {
+                    Log.i("rrest",it.message.toString())
+                    _uiEvent.send(
+                        UiEvent.ShowSnackBar(
+                            UiText.StringResources(R.string.something_went_wrong)
+                        )
+                    )
                 }
         }
-
     }
 }
