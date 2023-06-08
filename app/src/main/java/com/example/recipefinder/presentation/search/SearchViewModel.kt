@@ -49,7 +49,8 @@ class SearchViewModel @Inject constructor(
         when(event) {
             is SearchEvents.OnSearchEnter -> {
                 searchValue = event.searchQuery
-//                searchQuery()
+                state.value = state.value.copy(products = emptyList(), loading = true)
+                searchQuery()
             }
             is SearchEvents.OnSearchClick -> {
                 state.value = state.value.copy(products = emptyList(), loading = true)
